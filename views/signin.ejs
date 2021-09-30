@@ -101,14 +101,14 @@ margin-left: 4px;
           <h3>Sign In</h3>
         </div>
         <div class="card-body">
-          <form>
+          <form action="/signin" method="POST">
             <div class="input-group form-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"
                   ><i class="fas fa-user"></i
                 ></span>
               </div>
-              <input type="text" class="form-control" placeholder="username" />
+              <input type="text" class="form-control" placeholder="username" name="username"/>
             </div>
             <div class="input-group form-group">
               <div class="input-group-prepend">
@@ -118,6 +118,7 @@ margin-left: 4px;
                 type="password"
                 class="form-control"
                 placeholder="password"
+                name="password"
               />
             </div>
 
