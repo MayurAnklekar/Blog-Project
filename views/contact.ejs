@@ -20,7 +20,7 @@
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <p>Want to get in touch? Fill out the form below to send me a message and I will get back to you as soon as possible!</p>
                         <div class="my-5">
-                            <form id="contactForm" method="post" action="{{url_for('contact_page')}}">
+                            <form id="contactForm" method="post" action="/contact">
                                 <div class="form-floating">
                                     <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" name="username" />
                                     <label for="name">Name</label>
@@ -31,6 +31,11 @@
                                     <label for="email">Email address</label>
                                     <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
                                     <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" id="subject" type="subject" placeholder="Enter the subject..." data-sb-validations="required" name="mail_subject" />
+                                    <label for="email">Subject</label>
+                                    <div class="invalid-feedback" data-sb-feedback="subject:required">A Subject is required.</div>
                                 </div>
                                 <div class="form-floating">
                                     <input class="form-control" id="phone" type="tel" placeholder="Enter your phone number..." data-sb-validations="required" name="phone_no"/>
