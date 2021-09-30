@@ -71,7 +71,7 @@ app.post("/contact", function (req, res) {
   const mail_subject = `Coding Club Blog Message: ${req.body.mail_subject}`;
   const phone = req.body.phone_no;
   const mailMessage = req.body.user_message;
-  const mail_body = `Mail from Coding Club Blogs\nName :  ${name}\nemail : ${recepient_email}\nPhone : ${phone}\nSubject : ${mail_subject}\nMessage : ${mailMessage}\n`;
+  const mail_body = `Mail from Coding Club Blogs\nName :  ${name}\nemail : ${recepient_email}\nPhone : ${phone}\nSubject : ${req.body.mail_subject}\nMessage : ${mailMessage}\n`;
   const transporter = nodemailer.createTransport({
     service: "yahoo",
     host: "smtp.mail.yahoo.com",
@@ -96,7 +96,6 @@ app.post("/contact", function (req, res) {
       console.log("Error " + err);
     } else {
       console.log("Email sent successfully");
-      alert("Mail sent successfully!");
     }
   });
   res.redirect("/");
