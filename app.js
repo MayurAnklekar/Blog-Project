@@ -59,6 +59,12 @@ app.get('/contact', function(req, res){
 app.get('/about', function(req, res){
   res.render('about');
 });
+app.get('/signin', function(req, res){
+  res.render('signin');
+});
+app.get('/signup', function(req, res){
+  res.render('signup');
+});
 
 app.listen(3000, function(req, res){
     console.log("server running on port 3000");
