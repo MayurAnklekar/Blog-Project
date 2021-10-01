@@ -1,4 +1,5 @@
 const express = require("express");
+const ejs = require("ejs");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
@@ -136,12 +137,28 @@ app.get("/posts/:id", function (req, res) {
   data_from_db.forEach(function (blog) {
     const storedId = blog.id;
     if (postId === storedId) {
-      // console.log("Match Found!");
       res.render("posts", {
         title: blog.title,
         body: blog.post,
 
       });
+    }
+  });
+});
+
+app.get("/compose", function(req, res){
+  res.render("compose");
+});
+
+app.post("/compose", function(req, res){
+  const post = new Post({
+    title: req.body.postTitle,
+    content: req.body.postBody
+  });
+  
+  post.save(function(err){
+    if (!err){
+        res.redirect("/");
     }
   });
 });
