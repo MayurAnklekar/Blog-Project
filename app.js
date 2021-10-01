@@ -3,9 +3,14 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+
 require("dotenv").config();
 
+("use strict");
+const nodemailer = require("nodemailer");
 const app = express();
+
+const port = process.env.PORT || 3000;
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -15,6 +20,7 @@ app.use(
   })
 );
 app.use(express.static(__dirname + "/public"));
+
 
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -46,6 +52,7 @@ const data_from_db = [
     post: "When coronavirus closed schools in March, every teacher did the best they could to transition to emergency schooling. This fall educators across the country reimagined their teaching spaces and got creative to engage a new group of students. They’re using new online teaching tools and tech essentials for virtual classrooms that make online instruction easier. My job as a teacher is to cultivate a thriving classroom. I rely on tools that let my 8th grade computer science students see, hear, and understand me whether in person or online. Now that we’ve settled into the school year, gotten to know our kids through Zoom, and become more comfortable delivering online instruction, it’s time to take stock of what’s working and what isn’t.",
   },
 ];
+
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -119,7 +126,6 @@ app.post("/signin", function(req, res){
   })
 
 });
-
 app.get("/", function (req, res) {
   //database for posts comes here
   res.render("index", { data_from_db: data_from_db });
@@ -134,7 +140,7 @@ app.get("/posts/:id", function (req, res) {
       res.render("posts", {
         title: blog.title,
         body: blog.post,
-        id: blog.id,
+
       });
     }
   });
@@ -142,6 +148,46 @@ app.get("/posts/:id", function (req, res) {
 
 app.get("/contact", function (req, res) {
   res.render("contact");
+});
+
+
+const destinationEmailID = 'mayurs0802@gmail.com';    //THIS HAS TO BE CHANGED TO THE MAIL WHICH HAS TO RECIEVE ALL THE MAILS
+
+app.post("/contact", function (req, res) {
+  const name = req.body.username;
+  const recepient_email = req.body.email_id;
+  const mail_subject = `Coding Club Blog Message: ${req.body.mail_subject}`;
+  const phone = req.body.phone_no;
+  const mailMessage = req.body.user_message;
+  const mail_body = `Mail from Coding Club Blogs\nName :  ${name}\nemail : ${recepient_email}\nPhone : ${phone}\nSubject : ${req.body.mail_subject}\nMessage : ${mailMessage}\n`;
+  const transporter = nodemailer.createTransport({
+    service: "yahoo",
+    host: "smtp.mail.yahoo.com",
+    port: 465,
+    secure: false,
+    auth: {
+      user: process.env.MAIL_USERNAME,
+      pass: process.env.MAIL_PASSWORD,
+    },
+    debug: false,
+    logger: true,
+  });
+
+  let mailOptions = {
+    from: process.env.MAIL_USERNAME,
+    to: destinationEmailID,
+    subject: mail_subject,
+    text: mail_body,
+  };
+  transporter.sendMail(mailOptions, function (err, data) {
+    if (err) {
+      console.log("Error " + err);
+    } else {
+      console.log("Email sent successfully");
+    }
+  });
+  res.redirect("/");
+  
 });
 app.get("/about", function (req, res) {
   res.render("about");
@@ -152,7 +198,7 @@ app.get("/signin", function (req, res) {
 app.get("/signup", function (req, res) {
   res.render("signup");
 });
+app.listen(port, function (req, res) {
+  console.log(`server running on port ${port}`);
 
-app.listen(3000, function (req, res) {
-  console.log("server running on port 3000");
 });
