@@ -24,7 +24,7 @@ app.use(express.static(__dirname + "/public"));
 
 
 mongoose
-  .connect(MONGO_URL, {
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -231,7 +231,7 @@ app.get("/signin", function (req, res) {
 app.get("/signup", function (req, res) {
   res.render("signup");
 });
-app.listen(port, function (req, res) {
-  console.log(`server running on port ${port}`);
+app.listen(3000, function (req, res) {
+  console.log(`server running on port 3000`);
 
 });
