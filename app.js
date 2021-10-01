@@ -23,7 +23,7 @@ app.use(express.static(__dirname + "/public"));
 
 
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect("mongodb://localhost:27017/blogDB", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -127,8 +127,24 @@ app.post("/signin", function(req, res){
 
 });
 app.get("/", function (req, res) {
-  //database for posts comes here
   res.render("index", { data_from_db: data_from_db });
+});
+
+app.get("/compose", function(req, res){
+  res.render("compose");
+});
+
+app.post("/compose", function(req, res){
+  const post = new Post({
+    title: req.body.postTitle,
+    content: req.body.postBody
+  });
+
+  post.save(function(err){
+    if (!err){
+        res.redirect("/");
+    }
+  });
 });
 
 app.get("/posts/:id", function (req, res) {
@@ -187,7 +203,7 @@ app.post("/contact", function (req, res) {
     }
   });
   res.redirect("/");
-  
+
 });
 app.get("/about", function (req, res) {
   res.render("about");
