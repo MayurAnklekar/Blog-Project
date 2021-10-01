@@ -21,19 +21,19 @@
                 <div class="col-md-10 col-lg-8 col-xl-7">
                     <p>Enter the form given below.</p>
                     <div class="my-5">
-                        <form id="contactForm" action="/compose" method="post" novalidate>
+                        <form id="contactForm" action="/compose" method="POST" novalidate>
                           <div class="form-floating">
                               <input class="form-control" id="name" type="text" placeholder="Enter your name..." data-sb-validations="required" name="username" required/>
                               <label for="name">Your username</label>
                               <div class="invalid-feedback" data-sb-feedback="name:required">Username is required.</div>
                           </div>
                             <div class="form-floating">
-                                <input class="form-control" id="name" type="text" placeholder="Enter the title..." data-sb-validations="required" name="username" required/>
+                                <input class="form-control" id="name" type="text" placeholder="Enter the title..." data-sb-validations="required" name="title" required/>
                                 <label for="name">Title</label>
                                 <div class="invalid-feedback" data-sb-feedback="name:required">A title is required.</div>
                             </div>
                             <div class="form-floating">
-                                <textarea class="form-control" id="message" placeholder="Enter your blog post here..." style="height: 12rem" data-sb-validations="required" name="user_message" required></textarea>
+                                <textarea class="form-control" id="message" placeholder="Enter your blog post here..." style="height: 12rem" data-sb-validations="required" name="post" required></textarea>
                                 <label for="message">Post</label>
                                 <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.</div>
                             </div>

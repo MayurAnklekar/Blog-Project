@@ -75,7 +75,7 @@ const PostSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  desc: {
+  body: {
     type: String,
     required: true,
   },
@@ -135,15 +135,22 @@ app.get("/compose", function(req, res){
   res.render("compose");
 });
 
+
+
 app.post("/compose", function(req, res){
-  const post = new Post({
-    title: req.body.postTitle,
-    content: req.body.postBody
+  const newPost = new Post({
+    title: req.body.title,
+    body: req.body.post,
+    username: req.body.username
   });
 
-  post.save(function(err){
-    if (!err){
-        res.redirect("/");
+  newPost.save(function(err){
+    if (err){
+        console.log(err);
+    }
+    else
+    {
+      res.redirect("/");
     }
   });
 });
@@ -161,6 +168,8 @@ app.get("/posts/:id", function (req, res) {
     }
   });
 });
+
+
 
 app.get("/compose", function(req, res){
   res.render("compose");
