@@ -1,12 +1,17 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 require("dotenv").config();
 
 ("use strict");
 const nodemailer = require("nodemailer");
 const app = express();
+
 const port = process.env.PORT || 3000;
-app.use(bodyParser.urlencoded({ extended: true }));
+
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(
@@ -15,6 +20,14 @@ app.use(
   })
 );
 app.use(express.static(__dirname + "/public"));
+
+
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(console.log("Connected to MongoDB"));
 
 const data_from_db = [
   {
@@ -40,6 +53,79 @@ const data_from_db = [
   },
 ];
 
+
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
+
+const User = mongoose.model("User", userSchema);
+
+const PostSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  desc: {
+    type: String,
+    required: true,
+  },
+  username: String,
+});
+
+const Post = mongoose.model("Post", PostSchema);
+
+app.post("/signup", function (req, res) {
+  bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+    const newUser = new User({
+      username: req.body.username,
+      password: hash,
+    });
+
+    newUser.save(function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("about");
+      }
+    });
+  });
+});
+
+app.post("/signin", function(req, res){
+
+
+  User.findOne({username:req.body.username}, function(err, foundUser){
+    if(err)
+    {
+      console.log(err);
+    }
+    else{
+      if(foundUser)
+      {
+        bcrypt.compare(req.body.password, foundUser.password, function(err, result) {
+          if(result===true)
+          {
+            res.render("contact");
+          }
+          else
+          {
+            console.log(err);
+          }
+      });
+      }
+    }
+  })
+
+});
 app.get("/", function (req, res) {
   //database for posts comes here
   res.render("index", { data_from_db: data_from_db });
@@ -54,6 +140,7 @@ app.get("/posts/:id", function (req, res) {
       res.render("posts", {
         title: blog.title,
         body: blog.post,
+
       });
     }
   });
@@ -62,6 +149,7 @@ app.get("/posts/:id", function (req, res) {
 app.get("/contact", function (req, res) {
   res.render("contact");
 });
+
 
 const destinationEmailID = 'mayurs0802@gmail.com';    //THIS HAS TO BE CHANGED TO THE MAIL WHICH HAS TO RECIEVE ALL THE MAILS
 
@@ -101,7 +189,6 @@ app.post("/contact", function (req, res) {
   res.redirect("/");
   
 });
-
 app.get("/about", function (req, res) {
   res.render("about");
 });
@@ -111,7 +198,7 @@ app.get("/signin", function (req, res) {
 app.get("/signup", function (req, res) {
   res.render("signup");
 });
-
 app.listen(port, function (req, res) {
   console.log(`server running on port ${port}`);
+
 });
