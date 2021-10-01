@@ -24,7 +24,7 @@ app.use(express.static(__dirname + "/public"));
 
 
 mongoose
-  .connect("mongodb://localhost:27017/blogDB", {
+  .connect(MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
