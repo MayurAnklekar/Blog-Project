@@ -2,8 +2,9 @@ const express = require("express");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 require("dotenv").config();
 
@@ -22,6 +23,16 @@ app.use(
 );
 app.use(express.static(__dirname + "/public"));
 
+app.use(
+  session({
+    secret: "ShhhThisisaSecret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -54,7 +65,6 @@ const data_from_db = [
   },
 ];
 
-
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -63,11 +73,17 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
   },
 });
 
+userSchema.plugin(passportLocalMongoose);
+
 const User = mongoose.model("User", userSchema);
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 const PostSchema = new mongoose.Schema({
   title: {
@@ -85,71 +101,58 @@ const PostSchema = new mongoose.Schema({
 const Post = mongoose.model("Post", PostSchema);
 
 app.post("/signup", function (req, res) {
-  bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-    const newUser = new User({
-      username: req.body.username,
-      password: hash,
-    });
-
-    newUser.save(function (err) {
+  User.register(
+    { username: req.body.username },
+    req.body.password,
+    function (err, user) {
       if (err) {
         console.log(err);
+        res.redirect("/signup");
       } else {
-        res.render("about");
+        passport.authenticate("local")(req, res, function () {
+          res.redirect("/");
+        });
       }
-    });
+    }
+  );
+});
+
+app.post("/signin", function (req, res) {
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password,
+  });
+
+  req.login(user, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      passport.authenticate("local")(req, res, function () {
+        res.redirect("/");
+      });
+    }
   });
 });
 
-app.post("/signin", function(req, res){
-
-
-  User.findOne({username:req.body.username}, function(err, foundUser){
-    if(err)
-    {
-      console.log(err);
-    }
-    else{
-      if(foundUser)
-      {
-        bcrypt.compare(req.body.password, foundUser.password, function(err, result) {
-          if(result===true)
-          {
-            res.render("contact");
-          }
-          else
-          {
-            console.log(err);
-          }
-      });
-      }
-    }
-  })
-
-});
 app.get("/", function (req, res) {
   res.render("index", { data_from_db: data_from_db });
 });
 
-app.get("/compose", function(req, res){
+app.get("/compose", function (req, res) {
   res.render("compose");
 });
 
-
-
-app.post("/compose", function(req, res){
+app.post("/compose", function (req, res) {
   const newPost = new Post({
     title: req.body.title,
     body: req.body.post,
-    username: req.body.username
+    username: req.body.username,
   });
 
-  newPost.save(function(err){
-    if (err){
-        console.log(err);
-    }
-    else
-    {
+  newPost.save(function (err) {
+    if (err) {
+      console.log(err);
+    } else {
       res.redirect("/");
     }
   });
@@ -163,27 +166,28 @@ app.get("/posts/:id", function (req, res) {
       res.render("posts", {
         title: blog.title,
         body: blog.post,
-
       });
     }
   });
 });
 
-
-
-app.get("/compose", function(req, res){
-  res.render("compose");
+app.get("/compose", function (req, res) {
+  if (req.isAuthenticated()) {
+    res.render("compose");
+  } else {
+    res.redirect("/signin");
+  }
 });
 
-app.post("/compose", function(req, res){
+app.post("/compose", function (req, res) {
   const post = new Post({
     title: req.body.postTitle,
-    content: req.body.postBody
+    content: req.body.postBody,
   });
-  
-  post.save(function(err){
-    if (!err){
-        res.redirect("/");
+
+  post.save(function (err) {
+    if (!err) {
+      res.redirect("/");
     }
   });
 });
@@ -192,8 +196,7 @@ app.get("/contact", function (req, res) {
   res.render("contact");
 });
 
-
-const destinationEmailID = 'mayurs0802@gmail.com';    //THIS HAS TO BE CHANGED TO THE MAIL WHICH HAS TO RECIEVE ALL THE MAILS
+const destinationEmailID = "mayurs0802@gmail.com"; //THIS HAS TO BE CHANGED TO THE MAIL WHICH HAS TO RECIEVE ALL THE MAILS
 
 app.post("/contact", function (req, res) {
   const name = req.body.username;
@@ -229,7 +232,6 @@ app.post("/contact", function (req, res) {
     }
   });
   res.redirect("/");
-
 });
 app.get("/about", function (req, res) {
   res.render("about");
@@ -242,5 +244,4 @@ app.get("/signup", function (req, res) {
 });
 app.listen(3000, function (req, res) {
   console.log(`server running on port 3000`);
-
 });
