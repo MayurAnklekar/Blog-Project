@@ -24,9 +24,9 @@
           <% const blog = data_from_db[i] %> 
           <div class="post-preview">
             
-            <a href ="/posts/<%=blog.id%>">
+            <a href ="/posts/<%=blog._id%>">
               <h2 class="post-title"><%= blog.title %> </h2>
-              <h3 class="post-subtitle"><%= blog.post.substring(0, 100)+ ' ...' %> </h3>
+              <h3 class="post-subtitle"><%= blog.body.substring(0, 100)+ ' ...' %> </h3>
             </a>
             <p class="post-meta">
               Posted by
