@@ -113,7 +113,6 @@ app.post("/signin", function (req, res) {
 
 app.get("/", function (req, res) {
 
-  
     Post.find({  }, function (err, foundUsers) {
       if (err) {
         console.log(err);
@@ -126,9 +125,7 @@ app.get("/", function (req, res) {
   
 });
 
-app.get("/compose", function (req, res) {
-  res.render("compose");
-});
+
 
 app.post("/compose", function (req, res) {
   const newPost = new Post({
@@ -146,7 +143,10 @@ app.post("/compose", function (req, res) {
   });
 });
 
-
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 app.get("/posts/:id", function (req, res) {
   const postId = req.params.id;
