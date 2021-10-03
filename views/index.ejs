@@ -20,7 +20,7 @@
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <!-- for loop for possts... -->
-        <% for( let i=0; i < data_from_db.length; i++ ) { %>
+        <% for( let i=data_from_db.length-1; i >= 0; i-- ) { %>
           <% const blog = data_from_db[i] %> 
           <div class="post-preview">
             
