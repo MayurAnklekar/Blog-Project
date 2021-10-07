@@ -41,7 +41,6 @@ mongoose
   })
   .then(console.log("Connected to MongoDB"));
 
-
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -112,26 +111,22 @@ app.post("/signin", function (req, res) {
 });
 
 app.get("/", function (req, res) {
-
-    Post.find({  }, function (err, foundUsers) {
-      if (err) {
-        console.log(err);
-      } else {
-        if (foundUsers) {
-          res.render("index", { data_from_db: foundUsers });
-        }
+  Post.find({}, function (err, foundUsers) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (foundUsers) {
+        res.render("index", { data_from_db: foundUsers });
       }
-    });
-  
+    }
+  });
 });
-
-
 
 app.post("/compose", function (req, res) {
   const newPost = new Post({
     title: req.body.title,
     body: req.body.post,
-    username: req.body.username
+    username: req.body.username,
   });
 
   newPost.save(function (err) {
@@ -143,29 +138,30 @@ app.post("/compose", function (req, res) {
   });
 });
 
-app.get('/logout', function(req, res){
+app.use(function(req, res, next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+})
+
+
+app.get("/logout", function (req, res) {
   req.logout();
-  res.redirect('/');
+  res.redirect("/");
 });
 
 app.get("/posts/:id", function (req, res) {
   const postId = req.params.id;
- 
-
-  Post.findById( postId , function (err, foundUsers) {
+  Post.findById(postId, function (err, foundUsers) {
     if (err) {
       console.log(err);
     } else {
       if (foundUsers) {
-        res.render("posts", { title: foundUsers.title, body:foundUsers.body });
+        res.render("posts", { title: foundUsers.title, body: foundUsers.body });
       }
     }
-  
-
-  
-
-} )
+  });
 });
+
 
 app.get("/compose", function (req, res) {
   if (req.isAuthenticated()) {
